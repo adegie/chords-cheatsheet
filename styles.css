@@ -385,8 +385,7 @@ input {
   flex-wrap: wrap;
 }
 
-.selection-actions button,
-.select-chord {
+.selection-actions button {
   border: 1px solid var(--line);
   border-radius: 14px;
   color: var(--ink);
@@ -400,15 +399,12 @@ input {
 }
 
 .selection-actions button:hover,
-.selection-actions button:focus-visible,
-.select-chord:hover,
-.select-chord:focus-visible {
+.selection-actions button:focus-visible {
   border-color: rgba(241, 189, 87, 0.65);
   transform: translateY(-1px);
 }
 
-.selection-actions button[aria-pressed="true"],
-.select-chord[aria-pressed="true"] {
+.selection-actions button[aria-pressed="true"] {
   color: #211407;
   background: var(--gold);
   border-color: var(--gold);
@@ -465,12 +461,20 @@ option {
   padding: 16px;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .chord-card.selected {
   border-color: rgba(241, 189, 87, 0.75);
   box-shadow: 0 18px 46px rgba(241, 189, 87, 0.12);
+}
+
+.chord-card:hover,
+.chord-card:focus-visible {
+  border-color: rgba(241, 189, 87, 0.45);
+  transform: translateY(-1px);
+  outline: 0;
 }
 
 .chord-card::before {
@@ -488,12 +492,6 @@ option {
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 12px;
-}
-
-.card-actions {
-  display: grid;
-  justify-items: end;
-  gap: 8px;
 }
 
 .chord-name {
@@ -520,12 +518,6 @@ option {
   padding: 6px 9px;
   font-size: 0.75rem;
   font-weight: 800;
-}
-
-.select-chord {
-  min-height: 34px;
-  padding: 0 10px;
-  font-size: 0.75rem;
 }
 
 .notes {

@@ -139,16 +139,13 @@ function cardHtml(root, type) {
   const isSelected = selectedChords.has(id);
 
   return `
-    <article class="chord-card${isSelected ? " selected" : ""}" data-chord-id="${escapeHtml(id)}" data-name="${escapeHtml(name)}" data-family="${escapeHtml(type.family)}">
+    <article class="chord-card${isSelected ? " selected" : ""}" data-chord-id="${escapeHtml(id)}" data-name="${escapeHtml(name)}" data-family="${escapeHtml(type.family)}" role="button" tabindex="0" aria-pressed="${String(isSelected)}" aria-label="${isSelected ? "Deselect" : "Select"} ${escapeHtml(name)}">
       <div class="card-head">
         <div>
           <h4 class="chord-name">${escapeHtml(name)}</h4>
           <span class="chord-kind">${escapeHtml(type.name)}</span>
         </div>
-        <div class="card-actions">
-          <span class="badge">${escapeHtml(type.family)}</span>
-          <button class="select-chord" type="button" data-chord-id="${escapeHtml(id)}" aria-pressed="${String(isSelected)}" aria-label="${isSelected ? "Deselect" : "Select"} ${escapeHtml(name)}">${isSelected ? "Selected" : "Select"}</button>
-        </div>
+        <span class="badge">${escapeHtml(type.family)}</span>
       </div>
       <p class="notes" aria-label="Notes in ${escapeHtml(name)}">${notes.map((note) => `<span class="note-chip">${escapeHtml(note)}</span>`).join("")}</p>
       <div class="meta">
@@ -281,10 +278,23 @@ function init() {
     renderChordLibrary();
   });
   chordGroups.addEventListener("click", (event) => {
-    const button = event.target.closest(".select-chord");
-    if (!button) return;
+    const card = event.target.closest(".chord-card");
+    if (!card) return;
 
-    const id = button.dataset.chordId;
+    toggleChordSelection(card.dataset.chordId);
+  });
+  chordGroups.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    const card = event.target.closest(".chord-card");
+    if (!card) return;
+
+    event.preventDefault();
+    toggleChordSelection(card.dataset.chordId);
+  });
+}
+
+function toggleChordSelection(id) {
     if (selectedChords.has(id)) {
       selectedChords.delete(id);
     } else {
@@ -292,7 +302,6 @@ function init() {
     }
 
     renderChordLibrary();
-  });
 }
 
 init();
