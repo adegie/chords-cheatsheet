@@ -201,6 +201,7 @@ function renderChordLibrary() {
     chords: filtered.filter((item) => item.root.name === root.name)
   })).filter((group) => group.chords.length > 0);
 
+  chordGroups.classList.toggle("selected-only-view", showSelectedOnly);
   updateSelectionControls();
   chordSummary.textContent = `Showing ${filtered.length} chord${filtered.length === 1 ? "" : "s"} from ${roots.length * chordTypes.length} total. ${selectedChords.size} selected.`;
 

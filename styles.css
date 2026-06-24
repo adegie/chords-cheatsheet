@@ -557,7 +557,15 @@ option {
 
 .chord-card.selected {
   border-color: rgba(241, 189, 87, 0.75);
-  box-shadow: 0 18px 46px rgba(241, 189, 87, 0.12);
+  border-width: 3px;
+  padding: 14px;
+  box-shadow: none;
+}
+
+.selected-only-view .chord-card.selected {
+  border-color: var(--line);
+  border-width: 1px;
+  padding: 16px;
 }
 
 .chord-card:hover,
