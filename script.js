@@ -60,6 +60,10 @@ const searchFilter = document.querySelector("#search-filter");
 const chordGroups = document.querySelector("#chord-groups");
 const chordSummary = document.querySelector("#chord-summary");
 const themeToggle = document.querySelector("#theme-toggle");
+const selectedOnlyToggle = document.querySelector("#selected-only-toggle");
+const clearSelectionButton = document.querySelector("#clear-selection");
+const selectedChords = new Set();
+let showSelectedOnly = false;
 
 function pitchClass(value) {
   return ((value % 12) + 12) % 12;
@@ -81,6 +85,10 @@ function noteName(root, semitone) {
 
 function chordName(root, type) {
   return `${root.name}${type.symbol}`;
+}
+
+function chordId(root, type) {
+  return `${root.name}::${type.symbol || "maj"}`;
 }
 
 function chordNotes(root, type) {
@@ -127,15 +135,20 @@ function cardHtml(root, type) {
   const notes = chordNotes(root, type);
   const activePcs = chordPitchClasses(root, type);
   const name = chordName(root, type);
+  const id = chordId(root, type);
+  const isSelected = selectedChords.has(id);
 
   return `
-    <article class="chord-card" data-name="${escapeHtml(name)}" data-family="${escapeHtml(type.family)}">
+    <article class="chord-card${isSelected ? " selected" : ""}" data-chord-id="${escapeHtml(id)}" data-name="${escapeHtml(name)}" data-family="${escapeHtml(type.family)}">
       <div class="card-head">
         <div>
           <h4 class="chord-name">${escapeHtml(name)}</h4>
           <span class="chord-kind">${escapeHtml(type.name)}</span>
         </div>
-        <span class="badge">${escapeHtml(type.family)}</span>
+        <div class="card-actions">
+          <span class="badge">${escapeHtml(type.family)}</span>
+          <button class="select-chord" type="button" data-chord-id="${escapeHtml(id)}" aria-pressed="${String(isSelected)}" aria-label="${isSelected ? "Deselect" : "Select"} ${escapeHtml(name)}">${isSelected ? "Selected" : "Select"}</button>
+        </div>
       </div>
       <p class="notes" aria-label="Notes in ${escapeHtml(name)}">${notes.map((note) => `<span class="note-chip">${escapeHtml(note)}</span>`).join("")}</p>
       <div class="meta">
@@ -157,8 +170,15 @@ function getFilteredChords() {
     const searchable = `${chordName(root, type)} ${root.name} ${type.name} ${type.symbol} ${type.family} ${type.formula} ${notes}`.toLowerCase();
     return (rootValue === "all" || root.name === rootValue)
       && (familyValue === "all" || type.family === familyValue)
-      && (!searchValue || searchable.includes(searchValue));
+      && (!searchValue || searchable.includes(searchValue))
+      && (!showSelectedOnly || selectedChords.has(chordId(root, type)));
   });
+}
+
+function updateSelectionControls() {
+  selectedOnlyToggle.textContent = showSelectedOnly ? "Show all chords" : "Show selected only";
+  selectedOnlyToggle.setAttribute("aria-pressed", String(showSelectedOnly));
+  clearSelectionButton.disabled = selectedChords.size === 0;
 }
 
 function renderChordLibrary() {
@@ -168,10 +188,11 @@ function renderChordLibrary() {
     chords: filtered.filter((item) => item.root.name === root.name)
   })).filter((group) => group.chords.length > 0);
 
-  chordSummary.textContent = `Showing ${filtered.length} chord${filtered.length === 1 ? "" : "s"} from ${roots.length * chordTypes.length} total.`;
+  updateSelectionControls();
+  chordSummary.textContent = `Showing ${filtered.length} chord${filtered.length === 1 ? "" : "s"} from ${roots.length * chordTypes.length} total. ${selectedChords.size} selected.`;
 
   if (grouped.length === 0) {
-    chordGroups.innerHTML = `<div class="empty-state">No chords match the current filters.</div>`;
+    chordGroups.innerHTML = `<div class="empty-state">${showSelectedOnly ? "No selected chords match the current filters." : "No chords match the current filters."}</div>`;
     return;
   }
 
@@ -250,6 +271,28 @@ function init() {
   rootFilter.addEventListener("change", renderChordLibrary);
   familyFilter.addEventListener("change", renderChordLibrary);
   searchFilter.addEventListener("input", renderChordLibrary);
+  selectedOnlyToggle.addEventListener("click", () => {
+    showSelectedOnly = !showSelectedOnly;
+    renderChordLibrary();
+  });
+  clearSelectionButton.addEventListener("click", () => {
+    selectedChords.clear();
+    showSelectedOnly = false;
+    renderChordLibrary();
+  });
+  chordGroups.addEventListener("click", (event) => {
+    const button = event.target.closest(".select-chord");
+    if (!button) return;
+
+    const id = button.dataset.chordId;
+    if (selectedChords.has(id)) {
+      selectedChords.delete(id);
+    } else {
+      selectedChords.add(id);
+    }
+
+    renderChordLibrary();
+  });
 }
 
 init();

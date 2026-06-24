@@ -351,8 +351,9 @@ tr:last-child td {
 
 .controls {
   display: grid;
-  grid-template-columns: 160px 220px minmax(220px, 1fr);
+  grid-template-columns: 160px 220px minmax(220px, 1fr) auto;
   gap: 14px;
+  align-items: end;
   margin: 24px 0 18px;
 }
 
@@ -376,6 +377,47 @@ input {
   padding: 13px 14px;
   font: inherit;
   outline: 0;
+}
+
+.selection-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.selection-actions button,
+.select-chord {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--control-bg);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 47px;
+  padding: 0 14px;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.selection-actions button:hover,
+.selection-actions button:focus-visible,
+.select-chord:hover,
+.select-chord:focus-visible {
+  border-color: rgba(241, 189, 87, 0.65);
+  transform: translateY(-1px);
+}
+
+.selection-actions button[aria-pressed="true"],
+.select-chord[aria-pressed="true"] {
+  color: #211407;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.selection-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
 }
 
 select:focus,
@@ -423,6 +465,12 @@ option {
   padding: 16px;
   position: relative;
   overflow: hidden;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.chord-card.selected {
+  border-color: rgba(241, 189, 87, 0.75);
+  box-shadow: 0 18px 46px rgba(241, 189, 87, 0.12);
 }
 
 .chord-card::before {
@@ -440,6 +488,12 @@ option {
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 12px;
+}
+
+.card-actions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
 }
 
 .chord-name {
@@ -466,6 +520,12 @@ option {
   padding: 6px 9px;
   font-size: 0.75rem;
   font-weight: 800;
+}
+
+.select-chord {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.75rem;
 }
 
 .notes {
