@@ -111,12 +111,12 @@ function renderFilters() {
 function keyboardHtml(activePcs) {
   const whiteKeys = whiteKeyNames.map((name, index) => {
     const active = activePcs.has(whiteKeyPcs[index]) ? " active" : "";
-    return `<span class="white-key${active}">${name}</span>`;
+    return `<span class="white-key${active}"></span>`;
   }).join("");
 
   const blackKeyHtml = blackKeys.map((key) => {
     const active = activePcs.has(key.pc) ? " active" : "";
-    return `<span class="black-key${active}" style="left: ${key.left}%">${key.name}</span>`;
+    return `<span class="black-key${active}" style="left: ${key.left}%"></span>`;
   }).join("");
 
   return `<div class="keyboard" aria-hidden="true"><div class="white-keys">${whiteKeys}</div>${blackKeyHtml}</div>`;
