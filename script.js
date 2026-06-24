@@ -67,10 +67,12 @@ const searchFilter = document.querySelector("#search-filter");
 const chordGroups = document.querySelector("#chord-groups");
 const chordSummary = document.querySelector("#chord-summary");
 const themeToggle = document.querySelector("#theme-toggle");
+const guitarModeToggle = document.querySelector("#guitar-mode-toggle");
 const selectedOnlyToggle = document.querySelector("#selected-only-toggle");
 const clearSelectionButton = document.querySelector("#clear-selection");
 const selectedChords = new Set();
 let showSelectedOnly = false;
+let showGuitarView = false;
 let selectedFifthsIndex = 0;
 
 const fifthsKeys = [
@@ -96,6 +98,14 @@ const diatonicDegrees = [
   { roman: "V", offset: 7, semitones: [0, 4, 7] },
   { roman: "vi", offset: 9, semitones: [0, 3, 7] },
   { roman: "vii°", offset: 11, semitones: [0, 3, 6] }
+];
+const guitarStrings = [
+  { name: "E", pc: 4 },
+  { name: "A", pc: 9 },
+  { name: "D", pc: 2 },
+  { name: "G", pc: 7 },
+  { name: "B", pc: 11 },
+  { name: "E", pc: 4 }
 ];
 
 function pitchClass(value) {
@@ -187,6 +197,61 @@ function miniKeyboardSvg(activePcs) {
   return `<svg class="mini-keyboard-svg" viewBox="0 0 140 48" role="img" aria-hidden="true" focusable="false">${whiteKeys}${blackKeys}</svg>`;
 }
 
+function guitarFretboardHtml(root, type) {
+  const activePcs = chordPitchClasses(root, type);
+  const rootPc = pitchClass(root.pc);
+  const left = 32;
+  const top = 30;
+  const fretWidth = 38;
+  const stringGap = 15;
+  const fretCount = 5;
+  const width = fretWidth * fretCount;
+  const stringLines = guitarStrings.map((string, index) => {
+    const y = top + index * stringGap;
+    return `<line class="guitar-string" x1="${left}" y1="${y}" x2="${left + width}" y2="${y}"></line>`;
+  }).join("");
+  const fretLines = Array.from({ length: fretCount + 1 }, (_, fret) => {
+    const x = left + fret * fretWidth;
+    return `<line class="guitar-fret${fret === 0 ? " guitar-nut" : ""}" x1="${x}" y1="${top}" x2="${x}" y2="${top + stringGap * 5}"></line>`;
+  }).join("");
+  const stringLabels = guitarStrings.map((string, index) => {
+    const y = top + index * stringGap + 4;
+    return `<text class="guitar-label" x="12" y="${y}">${string.name}</text>`;
+  }).join("");
+  const fretLabels = Array.from({ length: fretCount + 1 }, (_, fret) => {
+    const x = fret === 0 ? left - 13 : left + (fret - 0.5) * fretWidth;
+    return `<text class="guitar-fret-label" x="${x}" y="15" text-anchor="middle">${fret}</text>`;
+  }).join("");
+  const dots = guitarStrings.flatMap((string, stringIndex) => {
+    const y = top + stringIndex * stringGap;
+
+    return Array.from({ length: fretCount + 1 }, (_, fret) => {
+      const pc = pitchClass(string.pc + fret);
+      if (!activePcs.has(pc)) return "";
+
+      const x = fret === 0 ? left - 13 : left + (fret - 0.5) * fretWidth;
+      const isRoot = pc === rootPc;
+      return `<circle class="guitar-dot${isRoot ? " guitar-root" : ""}" cx="${x}" cy="${y}" r="5.7"></circle>`;
+    });
+  }).flat().join("");
+
+  return `
+    <div class="guitar-view" aria-label="Guitar fret map for ${escapeHtml(chordName(root, type))}">
+      <div class="guitar-view-head">
+        <strong>Guitar fret map</strong>
+        <span>standard tuning, frets 0-5</span>
+      </div>
+      <svg class="guitar-fretboard" viewBox="0 0 236 122" role="img" aria-hidden="true" focusable="false">
+        ${fretLabels}
+        ${stringLabels}
+        ${stringLines}
+        ${fretLines}
+        ${dots}
+      </svg>
+    </div>
+  `;
+}
+
 function cardHtml(root, type) {
   const notes = chordNotes(root, type);
   const activePcs = chordPitchClasses(root, type);
@@ -209,6 +274,7 @@ function cardHtml(root, type) {
         <span><strong>Semitones</strong><br>${escapeHtml(type.semitones.join("-"))}</span>
       </div>
       ${keyboardHtml(activePcs)}
+      ${showGuitarView ? guitarFretboardHtml(root, type) : ""}
     </article>
   `;
 }
@@ -229,6 +295,8 @@ function getFilteredChords() {
 }
 
 function updateSelectionControls() {
+  guitarModeToggle.textContent = showGuitarView ? "Hide guitar frets" : "Show guitar frets";
+  guitarModeToggle.setAttribute("aria-pressed", String(showGuitarView));
   selectedOnlyToggle.textContent = showSelectedOnly ? "Show all chords" : "Show selected only";
   selectedOnlyToggle.setAttribute("aria-pressed", String(showSelectedOnly));
   clearSelectionButton.disabled = selectedChords.size === 0;
@@ -376,6 +444,10 @@ function init() {
   rootFilter.addEventListener("change", renderChordLibrary);
   familyFilter.addEventListener("change", renderChordLibrary);
   searchFilter.addEventListener("input", renderChordLibrary);
+  guitarModeToggle.addEventListener("click", () => {
+    showGuitarView = !showGuitarView;
+    renderChordLibrary();
+  });
   selectedOnlyToggle.addEventListener("click", () => {
     showSelectedOnly = !showSelectedOnly;
     renderChordLibrary();

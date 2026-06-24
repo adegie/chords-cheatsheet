@@ -734,6 +734,66 @@ option {
   background: linear-gradient(#51d2be, #228979);
 }
 
+.guitar-view {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.guitar-view-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-bottom: 6px;
+}
+
+.guitar-view-head strong {
+  color: var(--ink);
+}
+
+.guitar-fretboard {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.guitar-string {
+  stroke: color-mix(in srgb, var(--muted) 72%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.guitar-fret {
+  stroke: color-mix(in srgb, var(--muted) 42%, transparent);
+  stroke-width: 1.4;
+}
+
+.guitar-nut {
+  stroke: var(--ink);
+  stroke-width: 4;
+}
+
+.guitar-label,
+.guitar-fret-label {
+  fill: var(--muted);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.guitar-dot {
+  fill: var(--teal);
+  stroke: color-mix(in srgb, var(--panel) 70%, transparent);
+  stroke-width: 1.4;
+}
+
+.guitar-root {
+  fill: var(--gold);
+}
+
 .empty-state {
   color: var(--muted);
   border: 1px dashed rgba(248, 243, 232, 0.28);
