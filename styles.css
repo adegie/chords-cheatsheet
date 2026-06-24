@@ -364,8 +364,13 @@ tr:last-child td {
   margin: 20px 0 8px;
 }
 
+.progression-card ul {
+  font-size: 0.88rem;
+  padding-left: 1.15rem;
+}
+
 .progression-card li + li {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .key-facts {
