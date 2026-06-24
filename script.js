@@ -64,6 +64,22 @@ const selectedOnlyToggle = document.querySelector("#selected-only-toggle");
 const clearSelectionButton = document.querySelector("#clear-selection");
 const selectedChords = new Set();
 let showSelectedOnly = false;
+let selectedFifthsIndex = 0;
+
+const fifthsKeys = [
+  { major: "C", minor: "Am", signature: "No sharps or flats", accidentals: "Natural notes only", scaleChords: ["C", "Dm", "Em", "F", "G", "Am", "Bdim"] },
+  { major: "G", minor: "Em", signature: "1 sharp", accidentals: "F#", scaleChords: ["G", "Am", "Bm", "C", "D", "Em", "F#dim"] },
+  { major: "D", minor: "Bm", signature: "2 sharps", accidentals: "F#, C#", scaleChords: ["D", "Em", "F#m", "G", "A", "Bm", "C#dim"] },
+  { major: "A", minor: "F#m", signature: "3 sharps", accidentals: "F#, C#, G#", scaleChords: ["A", "Bm", "C#m", "D", "E", "F#m", "G#dim"] },
+  { major: "E", minor: "C#m", signature: "4 sharps", accidentals: "F#, C#, G#, D#", scaleChords: ["E", "F#m", "G#m", "A", "B", "C#m", "D#dim"] },
+  { major: "B", minor: "G#m", signature: "5 sharps", accidentals: "F#, C#, G#, D#, A#", scaleChords: ["B", "C#m", "D#m", "E", "F#", "G#m", "A#dim"] },
+  { major: "F#/Gb", minor: "D#m/Ebm", signature: "6 sharps or 6 flats", accidentals: "F# key: F#, C#, G#, D#, A#, E#; Gb key: Bb, Eb, Ab, Db, Gb, Cb", scaleChords: ["F#", "G#m", "A#m", "B", "C#", "D#m", "E#dim"] },
+  { major: "Db", minor: "Bbm", signature: "5 flats", accidentals: "Bb, Eb, Ab, Db, Gb", scaleChords: ["Db", "Ebm", "Fm", "Gb", "Ab", "Bbm", "Cdim"] },
+  { major: "Ab", minor: "Fm", signature: "4 flats", accidentals: "Bb, Eb, Ab, Db", scaleChords: ["Ab", "Bbm", "Cm", "Db", "Eb", "Fm", "Gdim"] },
+  { major: "Eb", minor: "Cm", signature: "3 flats", accidentals: "Bb, Eb, Ab", scaleChords: ["Eb", "Fm", "Gm", "Ab", "Bb", "Cm", "Ddim"] },
+  { major: "Bb", minor: "Gm", signature: "2 flats", accidentals: "Bb, Eb", scaleChords: ["Bb", "Cm", "Dm", "Eb", "F", "Gm", "Adim"] },
+  { major: "F", minor: "Dm", signature: "1 flat", accidentals: "Bb", scaleChords: ["F", "Gm", "Am", "Bb", "C", "Dm", "Edim"] }
+];
 
 function pitchClass(value) {
   return ((value % 12) + 12) % 12;
@@ -202,15 +218,13 @@ function renderChordLibrary() {
 }
 
 function renderCircleOfFifths() {
-  const majorKeys = ["C", "G", "D", "A", "E", "B", "F#/Gb", "Db", "Ab", "Eb", "Bb", "F"];
-  const minorKeys = ["Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m/Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm"];
   const size = 520;
   const center = size / 2;
   const majorRadius = 194;
   const minorRadius = 126;
   const spokeRadius = 224;
 
-  const items = majorKeys.map((major, index) => {
+  const items = fifthsKeys.map((key, index) => {
     const angle = (index * 30 - 90) * Math.PI / 180;
     const majorX = center + Math.cos(angle) * majorRadius;
     const majorY = center + Math.sin(angle) * majorRadius;
@@ -218,11 +232,16 @@ function renderCircleOfFifths() {
     const minorY = center + Math.sin(angle) * minorRadius;
     const spokeX = center + Math.cos(angle) * spokeRadius;
     const spokeY = center + Math.sin(angle) * spokeRadius;
+    const isSelected = index === selectedFifthsIndex;
 
     return `
-      <line class="wheel-spoke" x1="${center}" y1="${center}" x2="${spokeX.toFixed(2)}" y2="${spokeY.toFixed(2)}"></line>
-      <text class="wheel-major" x="${majorX.toFixed(2)}" y="${majorY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${major}</text>
-      <text class="wheel-minor" x="${minorX.toFixed(2)}" y="${minorY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${minorKeys[index]}</text>
+      <g class="wheel-key${isSelected ? " selected" : ""}" data-fifths-index="${index}" role="button" tabindex="0" aria-label="Show ${key.major} major and ${key.minor} minor">
+        <line class="wheel-spoke" x1="${center}" y1="${center}" x2="${spokeX.toFixed(2)}" y2="${spokeY.toFixed(2)}"></line>
+        <circle class="wheel-hit wheel-hit-major" cx="${majorX.toFixed(2)}" cy="${majorY.toFixed(2)}" r="38"></circle>
+        <circle class="wheel-hit wheel-hit-minor" cx="${minorX.toFixed(2)}" cy="${minorY.toFixed(2)}" r="29"></circle>
+        <text class="wheel-major" x="${majorX.toFixed(2)}" y="${majorY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${key.major}</text>
+        <text class="wheel-minor" x="${minorX.toFixed(2)}" y="${minorY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${key.minor}</text>
+      </g>
     `;
   }).join("");
 
@@ -234,10 +253,45 @@ function renderCircleOfFifths() {
       <circle class="wheel-ring" cx="${center}" cy="${center}" r="160"></circle>
       <circle class="wheel-ring" cx="${center}" cy="${center}" r="82"></circle>
       ${items}
-      <text x="${center}" y="${center - 8}" text-anchor="middle" fill="#f8f3e8" font-size="20" font-weight="800">5ths</text>
-      <text x="${center}" y="${center + 18}" text-anchor="middle" fill="#c6bdad" font-size="13">clockwise</text>
+      <text class="wheel-center-title" x="${center}" y="${center - 8}" text-anchor="middle">5ths</text>
+      <text class="wheel-center-subtitle" x="${center}" y="${center + 18}" text-anchor="middle">click a key</text>
     </svg>
   `;
+
+  renderFifthsInfo();
+}
+
+function renderFifthsInfo() {
+  const key = fifthsKeys[selectedFifthsIndex];
+  const previousKey = fifthsKeys[pitchClass(selectedFifthsIndex - 1)];
+  const nextKey = fifthsKeys[pitchClass(selectedFifthsIndex + 1)];
+  const [one, two, three, four, five, six, seven] = key.scaleChords;
+
+  document.querySelector("#fifths-info").innerHTML = `
+    <p class="eyebrow">Selected key</p>
+    <h3>${escapeHtml(key.major)} major / ${escapeHtml(key.minor)} minor</h3>
+    <div class="key-facts">
+      <span><strong>Signature</strong>${escapeHtml(key.signature)}</span>
+      <span><strong>Accidentals</strong>${escapeHtml(key.accidentals)}</span>
+      <span><strong>IV chord</strong>${escapeHtml(four)} from ${escapeHtml(previousKey.major)} side</span>
+      <span><strong>V chord</strong>${escapeHtml(five)} from ${escapeHtml(nextKey.major)} side</span>
+    </div>
+    <h4>How to use the wheel</h4>
+    <ul>
+      <li><strong>Neighbor keys:</strong> ${escapeHtml(previousKey.major)} and ${escapeHtml(nextKey.major)} are the closest major keys to ${escapeHtml(key.major)}. Borrowing from them usually sounds natural.</li>
+      <li><strong>I-IV-V:</strong> use ${escapeHtml(one)} - ${escapeHtml(four)} - ${escapeHtml(five)} for a strong basic progression.</li>
+      <li><strong>ii-V-I:</strong> use ${escapeHtml(two)} - ${escapeHtml(five)} - ${escapeHtml(one)} for a jazz/pop resolution.</li>
+      <li><strong>Relative minor:</strong> ${escapeHtml(six)} uses the same notes as ${escapeHtml(one)} but feels darker because ${escapeHtml(key.minor.replace(/m/g, ""))} becomes home.</li>
+    </ul>
+    <div class="diatonic-chords" aria-label="Diatonic triads in ${escapeHtml(key.major)} major">
+      ${["I", "ii", "iii", "IV", "V", "vi", "vii°"].map((degree, index) => `<span><strong>${degree}</strong>${escapeHtml(key.scaleChords[index])}</span>`).join("")}
+    </div>
+  `;
+}
+
+function selectFifthsKey(index) {
+  selectedFifthsIndex = index;
+  renderCircleOfFifths();
 }
 
 function setTheme(theme) {
@@ -291,6 +345,21 @@ function init() {
 
     event.preventDefault();
     toggleChordSelection(card.dataset.chordId);
+  });
+  document.querySelector("#circle-of-fifths").addEventListener("click", (event) => {
+    const key = event.target.closest(".wheel-key");
+    if (!key) return;
+
+    selectFifthsKey(Number(key.dataset.fifthsIndex));
+  });
+  document.querySelector("#circle-of-fifths").addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    const key = event.target.closest(".wheel-key");
+    if (!key) return;
+
+    event.preventDefault();
+    selectFifthsKey(Number(key.dataset.fifthsIndex));
   });
 }
 
