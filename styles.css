@@ -113,14 +113,10 @@ footer {
 }
 
 .hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 28px;
-  align-items: stretch;
+  display: block;
 }
 
 .hero-copy,
-.hero-card,
 .panel {
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--panel) 82%, transparent);
@@ -224,30 +220,11 @@ h3 {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.hero-card {
-  border-radius: 30px;
-  padding: 28px;
-  background:
-    linear-gradient(160deg, rgba(241, 189, 87, 0.16), rgba(85, 214, 190, 0.08)),
-    color-mix(in srgb, var(--panel) 92%, transparent);
-}
-
-.hero-card h2 {
-  font-size: 2.2rem;
-}
-
-.hero-card ol,
-.hero-card p,
 .progression-card ul,
 .progression-card p,
-.tip-grid p,
 .section-heading p {
   color: var(--muted);
   line-height: 1.6;
-}
-
-.hero-card li + li {
-  margin-top: 10px;
 }
 
 main {
@@ -261,41 +238,11 @@ main {
   padding: clamp(22px, 4vw, 42px);
 }
 
-.intro {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 28px;
-  align-items: start;
-}
-
-.tip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.tip-grid article,
 .progression-card,
 .chord-card {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.045);
   border-radius: 22px;
-}
-
-.tip-grid article {
-  padding: 18px;
-}
-
-.tip-number {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: 16px;
-  color: #1d160b;
-  background: var(--gold);
-  border-radius: 50%;
-  font-weight: 800;
 }
 
 .split {
@@ -624,14 +571,11 @@ footer {
 }
 
 @media (max-width: 920px) {
-  .hero-grid,
-  .intro,
   .split,
   .fifths-layout {
     grid-template-columns: 1fr;
   }
 
-  .tip-grid,
   .controls {
     grid-template-columns: 1fr;
   }
@@ -650,7 +594,6 @@ footer {
   }
 
   .hero-copy,
-  .hero-card,
   .panel {
     border-radius: 24px;
   }
@@ -698,10 +641,8 @@ footer {
   }
 
   .hero-copy,
-  .hero-card,
   .panel,
   .chord-card,
-  .tip-grid article,
   .progression-card {
     box-shadow: none;
     background: #ffffff;
