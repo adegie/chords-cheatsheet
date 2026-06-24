@@ -59,6 +59,7 @@ const familyFilter = document.querySelector("#family-filter");
 const searchFilter = document.querySelector("#search-filter");
 const chordGroups = document.querySelector("#chord-groups");
 const chordSummary = document.querySelector("#chord-summary");
+const themeToggle = document.querySelector("#theme-toggle");
 
 function pitchClass(value) {
   return ((value % 12) + 12) % 12;
@@ -221,7 +222,26 @@ function renderCircleOfFifths() {
   `;
 }
 
+function setTheme(theme) {
+  const isLight = theme === "light";
+  document.body.classList.toggle("light-theme", isLight);
+  themeToggle.textContent = isLight ? "Dark theme" : "Light theme";
+  themeToggle.setAttribute("aria-pressed", String(isLight));
+  localStorage.setItem("piano-chords-theme", theme);
+}
+
+function initTheme() {
+  const savedTheme = localStorage.getItem("piano-chords-theme");
+  const preferredTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  setTheme(savedTheme || preferredTheme);
+
+  themeToggle.addEventListener("click", () => {
+    setTheme(document.body.classList.contains("light-theme") ? "dark" : "light");
+  });
+}
+
 function init() {
+  initTheme();
   renderFormulaTable();
   renderFilters();
   renderCircleOfFifths();

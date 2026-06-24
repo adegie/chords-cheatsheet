@@ -1,5 +1,9 @@
 :root {
   --bg: #100f16;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(143, 126, 247, 0.22), transparent 34rem),
+    radial-gradient(circle at 90% 15%, rgba(241, 189, 87, 0.2), transparent 28rem),
+    linear-gradient(135deg, #0d0c12 0%, #17131f 55%, #211626 100%);
   --panel: #191723;
   --panel-2: #211e2f;
   --ink: #f8f3e8;
@@ -11,7 +15,38 @@
   --violet: #8f7ef7;
   --line: rgba(248, 243, 232, 0.14);
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  --control-bg: rgba(255, 255, 255, 0.04);
+  --field-bg: rgba(255, 255, 255, 0.07);
+  --keyboard-white: #fbf8ee;
+  --keyboard-white-border: #d7cbb7;
+  --keyboard-white-ink: #4a3b29;
+  --keyboard-black: #111018;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body.light-theme {
+  --bg: #f8f3e8;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(143, 126, 247, 0.16), transparent 32rem),
+    radial-gradient(circle at 90% 15%, rgba(241, 189, 87, 0.28), transparent 28rem),
+    linear-gradient(135deg, #fffaf0 0%, #f3ead9 58%, #efe2d1 100%);
+  --panel: #fffaf1;
+  --panel-2: #f5ead9;
+  --ink: #1c1824;
+  --muted: #655b4d;
+  --gold: #b56f12;
+  --gold-dark: #744409;
+  --rose: #b8434b;
+  --teal: #167d72;
+  --violet: #5c50be;
+  --line: rgba(28, 24, 36, 0.16);
+  --shadow: 0 22px 60px rgba(69, 49, 23, 0.16);
+  --control-bg: rgba(255, 255, 255, 0.58);
+  --field-bg: rgba(255, 255, 255, 0.76);
+  --keyboard-white: #fffdf7;
+  --keyboard-white-border: #d1c0a5;
+  --keyboard-white-ink: #514330;
+  --keyboard-black: #201c24;
 }
 
 * {
@@ -25,10 +60,7 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(143, 126, 247, 0.22), transparent 34rem),
-    radial-gradient(circle at 90% 15%, rgba(241, 189, 87, 0.2), transparent 28rem),
-    linear-gradient(135deg, #0d0c12 0%, #17131f 55%, #211626 100%);
+  background: var(--page-bg);
   min-height: 100vh;
 }
 
@@ -55,21 +87,29 @@ footer {
   margin-bottom: 54px;
 }
 
-.topbar a {
+.topbar a,
+.theme-toggle {
   text-decoration: none;
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--control-bg);
   transition: color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
 .topbar a:hover,
-.topbar a:focus-visible {
+.topbar a:focus-visible,
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
   color: var(--ink);
   border-color: rgba(241, 189, 87, 0.55);
   transform: translateY(-1px);
+}
+
+.theme-toggle {
+  cursor: pointer;
+  font: inherit;
 }
 
 .hero-grid {
@@ -83,7 +123,7 @@ footer {
 .hero-card,
 .panel {
   border: 1px solid var(--line);
-  background: rgba(25, 23, 35, 0.78);
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
 }
@@ -189,7 +229,7 @@ h3 {
   padding: 28px;
   background:
     linear-gradient(160deg, rgba(241, 189, 87, 0.16), rgba(85, 214, 190, 0.08)),
-    rgba(25, 23, 35, 0.9);
+    color-mix(in srgb, var(--panel) 92%, transparent);
 }
 
 .hero-card h2 {
@@ -385,7 +425,7 @@ input {
   border: 1px solid var(--line);
   border-radius: 16px;
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--field-bg);
   padding: 13px 14px;
   font: inherit;
   outline: 0;
@@ -542,8 +582,8 @@ option {
 
 .white-key {
   color: #4a3b29;
-  background: #fbf8ee;
-  border-right: 1px solid #d7cbb7;
+  background: var(--keyboard-white);
+  border-right: 1px solid var(--keyboard-white-border);
   padding-bottom: 6px;
 }
 
@@ -558,7 +598,7 @@ option {
   width: 4.4%;
   height: 58%;
   color: #f7efe0;
-  background: #111018;
+  background: var(--keyboard-black);
   border-radius: 0 0 6px 6px;
   z-index: 2;
   padding-bottom: 5px;
