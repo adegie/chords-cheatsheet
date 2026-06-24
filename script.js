@@ -52,6 +52,13 @@ const blackKeys = [
   { name: "A#", pc: 10, left: 91.1 }
 ];
 const whiteKeyPcs = [0, 2, 4, 5, 7, 9, 11, 0, 2, 4, 5, 7, 9, 11];
+const miniBlackKeys = [
+  { name: "C#", pc: 1, left: 10.6 },
+  { name: "D#", pc: 3, left: 24.9 },
+  { name: "F#", pc: 6, left: 53.4 },
+  { name: "G#", pc: 8, left: 67.7 },
+  { name: "A#", pc: 10, left: 82.0 }
+];
 
 const formulaTable = document.querySelector("#formula-table");
 const rootFilter = document.querySelector("#root-filter");
@@ -79,6 +86,16 @@ const fifthsKeys = [
   { major: "Eb", minor: "Cm", signature: "3 flats", accidentals: "Bb, Eb, Ab", scaleChords: ["Eb", "Fm", "Gm", "Ab", "Bb", "Cm", "Ddim"] },
   { major: "Bb", minor: "Gm", signature: "2 flats", accidentals: "Bb, Eb", scaleChords: ["Bb", "Cm", "Dm", "Eb", "F", "Gm", "Adim"] },
   { major: "F", minor: "Dm", signature: "1 flat", accidentals: "Bb", scaleChords: ["F", "Gm", "Am", "Bb", "C", "Dm", "Edim"] }
+];
+const fifthsKeyPcs = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
+const diatonicDegrees = [
+  { roman: "I", offset: 0, semitones: [0, 4, 7] },
+  { roman: "ii", offset: 2, semitones: [0, 3, 7] },
+  { roman: "iii", offset: 4, semitones: [0, 3, 7] },
+  { roman: "IV", offset: 5, semitones: [0, 4, 7] },
+  { roman: "V", offset: 7, semitones: [0, 4, 7] },
+  { roman: "vi", offset: 9, semitones: [0, 3, 7] },
+  { roman: "vii°", offset: 11, semitones: [0, 3, 6] }
 ];
 
 function pitchClass(value) {
@@ -133,18 +150,41 @@ function renderFilters() {
   familyFilter.innerHTML = `<option value="all">All families</option>${families.map((family) => `<option value="${family}">${family}</option>`).join("")}`;
 }
 
-function keyboardHtml(activePcs) {
-  const whiteKeys = whiteKeyNames.map((name, index) => {
-    const active = activePcs.has(whiteKeyPcs[index]) ? " active" : "";
+function keyboardHtml(activePcs, className = "", singleOctave = false) {
+  const classes = ["keyboard", className].filter(Boolean).join(" ");
+  const visibleWhiteKeyNames = singleOctave ? whiteKeyNames.slice(0, 7) : whiteKeyNames;
+  const visibleWhiteKeyPcs = singleOctave ? whiteKeyPcs.slice(0, 7) : whiteKeyPcs;
+  const visibleBlackKeys = singleOctave ? miniBlackKeys : blackKeys;
+  const whiteKeys = visibleWhiteKeyNames.map((name, index) => {
+    const active = activePcs.has(visibleWhiteKeyPcs[index]) ? " active" : "";
     return `<span class="white-key${active}"></span>`;
   }).join("");
 
-  const blackKeyHtml = blackKeys.map((key) => {
+  const blackKeyHtml = visibleBlackKeys.map((key) => {
     const active = activePcs.has(key.pc) ? " active" : "";
     return `<span class="black-key${active}" style="left: ${key.left}%"></span>`;
   }).join("");
 
-  return `<div class="keyboard" aria-hidden="true"><div class="white-keys">${whiteKeys}</div>${blackKeyHtml}</div>`;
+  return `<div class="${classes}" aria-hidden="true"><div class="white-keys">${whiteKeys}</div>${blackKeyHtml}</div>`;
+}
+
+function miniKeyboardSvg(activePcs) {
+  const whiteKeys = [0, 2, 4, 5, 7, 9, 11].map((pc, index) => {
+    const active = activePcs.has(pc) ? " active" : "";
+    return `<rect class="mini-white${active}" x="${index * 20}" y="0" width="20" height="48" rx="3"></rect>`;
+  }).join("");
+  const blackKeys = [
+    { pc: 1, x: 14 },
+    { pc: 3, x: 34 },
+    { pc: 6, x: 74 },
+    { pc: 8, x: 94 },
+    { pc: 10, x: 114 }
+  ].map((key) => {
+    const active = activePcs.has(key.pc) ? " active" : "";
+    return `<rect class="mini-black${active}" x="${key.x}" y="0" width="12" height="30" rx="2"></rect>`;
+  }).join("");
+
+  return `<svg class="mini-keyboard-svg" viewBox="0 0 140 48" role="img" aria-hidden="true" focusable="false">${whiteKeys}${blackKeys}</svg>`;
 }
 
 function cardHtml(root, type) {
@@ -264,9 +304,22 @@ function renderCircleOfFifths() {
 
 function renderFifthsInfo() {
   const key = fifthsKeys[selectedFifthsIndex];
+  const keyPc = fifthsKeyPcs[selectedFifthsIndex];
   const previousKey = fifthsKeys[pitchClass(selectedFifthsIndex - 1)];
   const nextKey = fifthsKeys[pitchClass(selectedFifthsIndex + 1)];
   const [one, two, three, four, five, six, seven] = key.scaleChords;
+  const diatonicChordCards = diatonicDegrees.map((degree, index) => {
+    const rootPc = pitchClass(keyPc + degree.offset);
+    const activePcs = new Set(degree.semitones.map((semitone) => pitchClass(rootPc + semitone)));
+
+    return `
+      <span>
+        <strong>${degree.roman}</strong>
+        ${escapeHtml(key.scaleChords[index])}
+        ${miniKeyboardSvg(activePcs)}
+      </span>
+    `;
+  }).join("");
 
   document.querySelector("#fifths-info").innerHTML = `
     <p class="eyebrow">Selected key</p>
@@ -285,7 +338,7 @@ function renderFifthsInfo() {
       <li><strong>Relative minor:</strong> ${escapeHtml(six)} uses the same notes as ${escapeHtml(one)} but feels darker because ${escapeHtml(key.minor.replace(/m/g, ""))} becomes home.</li>
     </ul>
     <div class="diatonic-chords" aria-label="Diatonic triads in ${escapeHtml(key.major)} major">
-      ${["I", "ii", "iii", "IV", "V", "vi", "vii°"].map((degree, index) => `<span><strong>${degree}</strong>${escapeHtml(key.scaleChords[index])}</span>`).join("")}
+      ${diatonicChordCards}
     </div>
   `;
 }

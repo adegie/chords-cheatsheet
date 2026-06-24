@@ -439,6 +439,34 @@ tr:last-child td {
   margin-top: 18px;
 }
 
+.mini-keyboard-svg {
+  display: block;
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  margin-top: 8px;
+}
+
+.mini-white {
+  fill: var(--keyboard-white);
+  stroke: var(--keyboard-white-border);
+  stroke-width: 1;
+}
+
+.mini-white.active {
+  fill: var(--gold);
+}
+
+.mini-black {
+  fill: var(--keyboard-black);
+  stroke: rgba(0, 0, 0, 0.28);
+  stroke-width: 1;
+}
+
+.mini-black.active {
+  fill: var(--teal);
+}
+
 .controls {
   display: grid;
   grid-template-columns: 160px 220px minmax(220px, 1fr) auto;
