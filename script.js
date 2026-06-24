@@ -333,19 +333,25 @@ function renderCircleOfFifths() {
   const minorRadius = 126;
   const spokeRadius = 224;
 
+  const spokes = fifthsKeys.map((key, index) => {
+    const angle = (index * 30 - 90) * Math.PI / 180;
+    const spokeX = center + Math.cos(angle) * spokeRadius;
+    const spokeY = center + Math.sin(angle) * spokeRadius;
+    const isSelected = index === selectedFifthsIndex;
+
+    return `<line class="wheel-spoke${isSelected ? " selected" : ""}" x1="${center}" y1="${center}" x2="${spokeX.toFixed(2)}" y2="${spokeY.toFixed(2)}"></line>`;
+  }).join("");
+
   const items = fifthsKeys.map((key, index) => {
     const angle = (index * 30 - 90) * Math.PI / 180;
     const majorX = center + Math.cos(angle) * majorRadius;
     const majorY = center + Math.sin(angle) * majorRadius;
     const minorX = center + Math.cos(angle) * minorRadius;
     const minorY = center + Math.sin(angle) * minorRadius;
-    const spokeX = center + Math.cos(angle) * spokeRadius;
-    const spokeY = center + Math.sin(angle) * spokeRadius;
     const isSelected = index === selectedFifthsIndex;
 
     return `
       <g class="wheel-key${isSelected ? " selected" : ""}" data-fifths-index="${index}" role="button" tabindex="0" aria-label="Show ${key.major} major and ${key.minor} minor">
-        <line class="wheel-spoke" x1="${center}" y1="${center}" x2="${spokeX.toFixed(2)}" y2="${spokeY.toFixed(2)}"></line>
         <circle class="wheel-hit wheel-hit-major" cx="${majorX.toFixed(2)}" cy="${majorY.toFixed(2)}" r="38"></circle>
         <circle class="wheel-hit wheel-hit-minor" cx="${minorX.toFixed(2)}" cy="${minorY.toFixed(2)}" r="29"></circle>
         <text class="wheel-major" x="${majorX.toFixed(2)}" y="${majorY.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${key.major}</text>
@@ -361,6 +367,7 @@ function renderCircleOfFifths() {
       <circle class="wheel-ring" cx="${center}" cy="${center}" r="230"></circle>
       <circle class="wheel-ring" cx="${center}" cy="${center}" r="160"></circle>
       <circle class="wheel-ring" cx="${center}" cy="${center}" r="82"></circle>
+      ${spokes}
       ${items}
       <text class="wheel-center-title" x="${center}" y="${center - 8}" text-anchor="middle">5ths</text>
       <text class="wheel-center-subtitle" x="${center}" y="${center + 18}" text-anchor="middle">click a key</text>
