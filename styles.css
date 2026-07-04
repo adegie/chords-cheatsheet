@@ -709,19 +709,6 @@ option {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.guitar-view-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 0.72rem;
-  margin-bottom: 6px;
-}
-
-.guitar-view-head strong {
-  color: var(--ink);
-}
-
 .guitar-fretboard {
   display: block;
   width: 100%;

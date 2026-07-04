@@ -105,8 +105,9 @@ const guitarStrings = [
   { name: "D", pc: 2 },
   { name: "G", pc: 7 },
   { name: "B", pc: 11 },
-  { name: "E", pc: 4 }
+  { name: "e", pc: 4 }
 ];
+const guitarDisplayStrings = [...guitarStrings].reverse();
 
 function pitchClass(value) {
   return ((value % 12) + 12) % 12;
@@ -206,7 +207,7 @@ function guitarFretboardHtml(root, type) {
   const stringGap = 15;
   const fretCount = 5;
   const width = fretWidth * fretCount;
-  const stringLines = guitarStrings.map((string, index) => {
+  const stringLines = guitarDisplayStrings.map((string, index) => {
     const y = top + index * stringGap;
     return `<line class="guitar-string" x1="${left}" y1="${y}" x2="${left + width}" y2="${y}"></line>`;
   }).join("");
@@ -214,7 +215,7 @@ function guitarFretboardHtml(root, type) {
     const x = left + fret * fretWidth;
     return `<line class="guitar-fret${fret === 0 ? " guitar-nut" : ""}" x1="${x}" y1="${top}" x2="${x}" y2="${top + stringGap * 5}"></line>`;
   }).join("");
-  const stringLabels = guitarStrings.map((string, index) => {
+  const stringLabels = guitarDisplayStrings.map((string, index) => {
     const y = top + index * stringGap + 4;
     return `<text class="guitar-label" x="12" y="${y}">${string.name}</text>`;
   }).join("");
@@ -222,7 +223,7 @@ function guitarFretboardHtml(root, type) {
     const x = fret === 0 ? left - 13 : left + (fret - 0.5) * fretWidth;
     return `<text class="guitar-fret-label" x="${x}" y="15" text-anchor="middle">${fret}</text>`;
   }).join("");
-  const dots = guitarStrings.flatMap((string, stringIndex) => {
+  const dots = guitarDisplayStrings.flatMap((string, stringIndex) => {
     const y = top + stringIndex * stringGap;
 
     return Array.from({ length: fretCount + 1 }, (_, fret) => {
@@ -236,11 +237,7 @@ function guitarFretboardHtml(root, type) {
   }).flat().join("");
 
   return `
-    <div class="guitar-view" aria-label="Guitar fret map for ${escapeHtml(chordName(root, type))}">
-      <div class="guitar-view-head">
-        <strong>Guitar fret map</strong>
-        <span>standard tuning, frets 0-5</span>
-      </div>
+    <div class="guitar-view" aria-label="${escapeHtml(chordName(root, type))} guitar notes, frets 0 through 5">
       <svg class="guitar-fretboard" viewBox="0 0 236 122" role="img" aria-hidden="true" focusable="false">
         ${fretLabels}
         ${stringLabels}
